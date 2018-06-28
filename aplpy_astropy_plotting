@@ -1,0 +1,40 @@
+##This code is to plot images using aplpy and marks objects at specific coordinates
+
+from astropy.io import ascii
+import os
+from astropy.io import fits
+from astropy.wcs import WCS
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy as sp
+import aplpy as ap
+
+
+
+#using the cutouts from the thumbnail code
+
+
+datadir = '/cutouts/'
+pairfile = ascii.read('pairs_new.txt') #contains the coordinates of the objects I want to mark
+
+
+RAP = pairfile.columns['RAP']
+DECP = pairfile.columns['DECP']
+IDS = pairfile.columns['IDS']
+RAS = pairfile.columns['RAS']
+DECS = pairfile.columns['DECS']
+
+
+for i in range():
+	imfile = datadir + str(i)+'.fits'
+	gc = ap.FITSFigure(imfile) #creating the figure
+	#gc.set_theme('publication') #since this is for a publication
+	ra1 = RAP[i] #reading in the positions
+	dec1 = DECP[i]
+	ra2 = RAS[i]
+	dec2 = DECS[i]
+	
+	gc.show_markers([ra1,ra2],[dec1,dec2], marker = 'o', color = 'red', label = 'pair') #plotting the markers
+
+	gc.show_grayscale()
+	plt.show()

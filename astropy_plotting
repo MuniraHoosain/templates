@@ -1,5 +1,0 @@
-##This code is to plot images using astropy
-
-import numpy as np
-import astropy.io as ap
-
