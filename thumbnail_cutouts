@@ -1,0 +1,59 @@
+## How to cut out/crop fits images using astropy
+## We're cutting out thumbnail images of galaxies within a (large image) cluster
+## preserves the WCS/coordinate information as well
+
+
+from astropy.io import ascii
+import os
+from astropy.io import fits
+from astropy.wcs import WCS
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy as sp
+import astropy.visualization as viz
+from astropy.nddata import Cutout2D
+from astropy.coordinates import SkyCoord
+
+
+datadir = ## data directory
+imfile = datadir+'' ##name of your fits image file
+
+hdu = fits.open(imfile)[0]
+wcs = WCS(hdu.header)
+
+pairfile = ascii.read('') #file containing RA, DEC, IDs of objects that we want to
+
+
+#columns
+IDP = pairfile.columns['IDP']
+RAP = pairfile.columns['RAP']
+DECP = pairfile.columns['DECP']
+
+
+img = hdu.data  #loading up the primary image
+
+
+size = (180,180) #X Y size in pixels
+
+##Now, to cut out the images
+
+#you can remove the loop to cut out a single image, but I had a whole list of images to save
+
+for i in range(len(RAP)):
+	name = str(i) #name them whatever you like
+	outfile = 'cutouts/' + name + '.fits'	#created a new directory to save the croped images in
+	pairid = str(i) 
+	ra1 = RAP[i]
+	dec1 = DECP[i]
+	id1 = str(IDP[i])
+	position = SkyCoord(ra1, dec1, frame = 'fk5',unit = 'deg' ) #converting my fk5 degree-format RA and DEC to readable positions
+	cutout = Cutout2D(img,position,size, wcs) # this function creates the cut out
+	#ax = plt.subplot(projection = cutout.wcs) 
+	#ax.imshow(cutout.data, origin = 'lower', vmin=-1e-2, vmax=5.e-2, cmap='gray_r')
+	#plt.title('Galaxy pair ' + pairid + ': ' + id1)	
+	#plt.show()
+	cuthdu = cutout.wcs.to_header() #converts the wcs information to a saveable header
+	hdu1 = fits.PrimaryHDU(cutout.data, header = cuthdu) #creating the cropped fits image + storing the header images
+	hdu1.writeto(outfile, overwrite = True) #saving the cropped image
+
+
